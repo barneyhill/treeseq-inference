@@ -78,16 +78,16 @@ ${CENTROMERES_CSV}:
 # Recorded in the sample file provenance.
 REFERENCE_NAME=GRCh37
 
-ANCESTRAL_STATES_PREFIX=homo_sapiens_ancestor_GRCh37_e71
-ANCESTRAL_STATES_TARBALL=${ANCESTRAL_STATES_PREFIX}.tar.bz2
-ANCESTRAL_STATES_URL=ftp://ftp.ensembl.org/pub/release-75/fasta/ancestral_alleles/${ANCESTRAL_STATES_TARBALL}
+ANCESTRAL_STATES_PREFIX=homo_sapiens_ancestor_GRCh38
+ANCESTRAL_STATES_TARBALL=${ANCESTRAL_STATES_PREFIX}.tar.gz
+ANCESTRAL_STATES_URL=ftp://ftp.ensembl.org/pub/release-108/fasta/ancestral_alleles/${ANCESTRAL_STATES_TARBALL}
 
 ${ANCESTRAL_STATES_TARBALL}:
 	curl ${ANCESTRAL_STATES_URL} -o ${ANCESTRAL_STATES_TARBALL}
 
 ${ANCESTRAL_STATES_PREFIX}/README: ${ANCESTRAL_STATES_TARBALL}
 	rm -fR ${ANCESTRAL_STATES_PREFIX}
-	tar -jxvf ${ANCESTRAL_STATES_TARBALL}
+	tar -xf ${ANCESTRAL_STATES_TARBALL}
 	# Update access times or we'll keep rebuilding this rule. Have to make sure 
 	# that the README we touch is older than the actual fa files.
 	touch $@

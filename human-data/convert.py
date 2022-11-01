@@ -174,6 +174,50 @@ class VcfConverter(Converter):
         progress.close()
         self.report()
 
+class UKBBExomeConverter(VcfConverter):
+    """
+    Converts data for the 1000 Genomes.
+    """
+
+    def process_metadata(self, metadata_file, show_progress=False):
+        # TODO Should make this an explicit requirement rather than hardcoding.
+        # The sample IDs aren't in the BGEN file so we have to match by the Order
+        # field, which gives the order that each sample is at in the BGEN (0 based).
+        #metadata_df = pd.read_csv(metadata_file)
+        #metadata_df.sort_values(by="Order", inplace=True)
+        #metadata_df = metadata_df.set_index("Order")
+
+        ## VCF 
+        #
+        #with open(metadata_file, "r") as ped_file:
+        #    # Parse the individual metadata out of the ped file.
+        #    columns = next(ped_file).split("\t")
+        #    sane_names = [col.replace(" ", "_").lower().strip() for col in columns]
+        #    metadata = {}
+        #    populations = {}
+        #    for line in ped_file:
+        #        row = dict(zip(sane_names, line.strip().split("\t")))
+        #        name = row["individual_id"]
+        #        population_name = row.pop("population")
+        #        populations[name] = population_id_map[population_name]
+        #        # The value '0' seems to be used to encode missing, so insert None
+        #        # instead to be more useful.
+        #        nulled = {}
+        #        for key, value in row.items():
+        #            if value == "0":
+        #                value = None
+        #            nulled[key] = value
+        #        metadata[name] = nulled
+
+        vcf = cyvcf2.VCF(self.data_file)
+        individual_names = list(vcf.samples)
+        vcf.close()
+        self.num_samples = len(individual_names) * 2
+        # Add in the metadata rows in the order of the VCF.
+        for name in individual_names:
+            self.samples.add_individual(
+                metadata={"name": name}, ploidy=2)
+        
 
 class ThousandGenomesConverter(VcfConverter):
     """
